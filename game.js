@@ -5,10 +5,13 @@ function Game(){
   this.players = [new Player("black", 1), new Player("red", -1)];
   this.winner = null;
   this.activePlayer = this.players[0];
-  this.addToCol = function(col){
+}
+
+Game.prototype.addToCol = function(col){
     this.board.addPiece(col, this.activePlayer.num);
-  }
-  this.piecesRemaining = function(){
+}
+
+Game.prototype.piecesRemaining = function(){
     if(this.activePlayer.pieces > 0){
       return true;
     }
@@ -16,7 +19,6 @@ function Game(){
       return false;
     }
   }
-}
 
 Game.prototype.changeActivePlayer = function(){
   if(this.activePlayer === this.players[0]){
@@ -97,24 +99,25 @@ function Player(color, num){
   this.color = color;
   this.num = num;
   this.pieces = 8;
-  this.removePiece = function(){
+}
+
+Player.prototype.removePiece = function(){
     if(this.pieces > 0){
      this.pieces = this.pieces - 1;
     }
-  }
 }
-
 
 // CONTROLLER
 
 function Controller(){
   this.game = new Game();
-  this.start = function(){
-    while(this.game.winner === null){
-      this.play();
-    }
-    console.log("THE WINNER IS " + this.game.winner);
-  };
+}
+
+Controller.prototype.start = function(){
+  while(this.game.winner === null){
+    this.play();
+  }
+  console.log("THE WINNER IS " + this.game.winner);
 }
 
 Controller.prototype.play = function(){
