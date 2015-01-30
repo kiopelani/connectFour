@@ -8,6 +8,18 @@ function Game(){
   this.activePlayer = this.players[0];
 }
 
+Game.prototype.colFull = function(col){
+  if(this.board.allPieces[0][col] === 0){
+    console.log('false');
+    return false;
+  }
+  else {
+    console.log('true');
+    return true;
+  }
+}
+
+
 Game.prototype.addToCol = function(col){
   this.board.addPiece(col, this.activePlayer.num);
 }
@@ -155,16 +167,23 @@ Controller.prototype.play = function(){
   this.game.view.playerStats("Player: " +this.game.activePlayer.color + " Pieces: " + this.game.activePlayer.pieces);
   if(this.game.piecesRemaining()){
     var col = prompt("Enter your column number");
+    while(this.game.colFull(col)){
+      alert("That column is full. Choose Another column.");
+      var col = prompt("Enter your column number");
+    }
+    console.log(col);
     this.game.addToCol(parseInt(col));
     this.game.activePlayer.removePiece();
     if(this.game.board.connectFour()===false){
       this.game.changeActivePlayer();
     }
     else {
+      this.game.view.refreshBoard(this.game.board.allPieces);
       this.game.winner = this.game.activePlayer.color;
     }
   }
   else {
+    this.game.view.refreshBoard(this.game.board.allPieces);
     this.game.winner = "DRAW. No one wins."
   }
 }
