@@ -2,23 +2,38 @@
 
 function Game(){
   this.board = new Board();
-  this.view = new View();
+  this.view = new View(this);
   this.players = [new Player("black", 1), new Player("red", -1)];
   this.winner = null;
   this.activePlayer = this.players[0];
 }
 
-Game.prototype.colFull = function(col){
-  if(this.board.allPieces[0][col] === 0){
-    console.log('false');
-    return false;
+Game.prototype.start = function(){
+  this.play();
+}
+
+Game.prototype.play = function(){
+  this.view.playerStats("Player: " +this.activePlayer.color + " Pieces: " + this.activePlayer.pieces);
+  if(this.piecesRemaining() === false){
+    this.winner = "DRAW. No one wins";
+    this.view.displayMessage("THE WINNER IS " + this.winner);
   }
-  else {
-    console.log('true');
-    return true;
+  else if(this.winner !== null){
+    this.view.displayMessage("THE WINNER IS " + this.winner);
+  }
+  else{
+    this.view.prepareDragDrop(this.activePlayer);
   }
 }
 
+Game.prototype.colFull = function(col){
+  if(this.board.allPieces[0][col] === 0){
+    return false;
+  }
+  else {
+    return true;
+  }
+}
 
 Game.prototype.addToCol = function(col){
   this.board.addPiece(col, this.activePlayer.num);
@@ -119,16 +134,18 @@ Player.prototype.removePiece = function(){
 }
 
 // VIEW
-function View(){
+function View(game){
+  this.game = game;
   this.currentPlayer = $('#current-player');
   this.messages = $('#messages');
+  this.board = $('#board table');
 }
 
 View.prototype.displayMessage = function(message){
   this.messages.html(message);
 }
 
-View.prototype.refreshBoard = function(boardPieces){
+View.prototype.renderBoard = function(boardPieces){
   for(var row = 0; row < 4; row++){
     for(var col = 0; col < 4; col++){
       if(boardPieces[row][col] > 0){
@@ -149,47 +166,55 @@ View.prototype.playerStats = function(info){
   this.currentPlayer.html(info);
 }
 
-// CONTROLLER
-
-function Controller(){
-  this.game = new Game();
+View.prototype.prepareDragDrop = function(currPlayer){
+  this.renderBoard(this.game.board.allPieces);
+  this.makeDraggable(currPlayer);
+  this.makeDroppable();
 }
 
-Controller.prototype.start = function(){
-  while(this.game.winner === null){
-    this.play();
-  }
-  this.game.view.displayMessage("THE WINNER IS " + this.game.winner);
+View.prototype.makeDraggable = function(currPlayer){
+  var activePiece = $('#active-piece');
+  activePiece.css('background-color', currPlayer.color);
+  activePiece.draggable();
 }
 
-Controller.prototype.play = function(){
-  this.game.view.refreshBoard(this.game.board.allPieces);
-  this.game.view.playerStats("Player: " +this.game.activePlayer.color + " Pieces: " + this.game.activePlayer.pieces);
-  if(this.game.piecesRemaining()){
-    var col = prompt("Enter your column number");
-    while(this.game.colFull(col)){
-      alert("That column is full. Choose Another column.");
-      var col = prompt("Enter your column number");
-    }
-    console.log(col);
-    this.game.addToCol(parseInt(col));
-    this.game.activePlayer.removePiece();
-    if(this.game.board.connectFour()===false){
-      this.game.changeActivePlayer();
-    }
-    else {
-      this.game.view.refreshBoard(this.game.board.allPieces);
-      this.game.winner = this.game.activePlayer.color;
-    }
+View.prototype.makeDroppable = function(){
+  $('.first-row').droppable({
+    drop: this.executeOnDrop
+  });
+}
+
+View.prototype.executeOnDrop = function(event, ui){
+  var colIndex = parseInt(event.target.dataset.col);
+  myGame.addToCol(parseInt(colIndex));
+  myGame.activePlayer.removePiece();
+  if(myGame.board.connectFour()===false){
+      myGame.changeActivePlayer();
+      myGame.view.resetActivePiece();
+      myGame.play();
   }
   else {
-    this.game.view.refreshBoard(this.game.board.allPieces);
-    this.game.winner = "DRAW. No one wins."
+    myGame.view.renderBoard(myGame.board.allPieces);
+    myGame.winner = myGame.activePlayer.color;
+    myGame.view.resetActivePiece();
+    $('#active-piece').draggable('disable');
+    myGame.play();
   }
+}
+
+View.prototype.resetActivePiece = function(){
+  $("#active-piece").animate({
+        top: "0px",
+        left: "400px"
+    });
+}
+
+View.prototype.fadeActivePiece = function(){
+  $("#active-piece").fadeOut(500);
 }
 
 // DRIVER CODE
 $( document ).ready(function() {
-  var controller = new Controller();
-  controller.start();
+  myGame = new Game();
+  myGame.start();
 });
