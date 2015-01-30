@@ -2,6 +2,7 @@
 
 function Game(){
   this.board = new Board();
+  this.view = new View();
   this.players = [new Player("black", 1), new Player("red", -1)];
   this.winner = null;
   this.activePlayer = this.players[0];
@@ -107,6 +108,25 @@ Player.prototype.removePiece = function(){
     }
 }
 
+// VIEW
+function View(){
+  this.currentPlayer = $('#current-player');
+  this.board = $('#board');
+  this.messages = $('#messages');
+}
+
+View.prototype.displayMessage = function(message){
+  this.messages.html(message);
+}
+
+View.prototype.refreshBoard = function(boardPieces){
+  this.board.html(boardPieces.toString());
+}
+
+View.prototype.playerStats = function(info){
+  this.currentPlayer.html(info);
+}
+
 // CONTROLLER
 
 function Controller(){
@@ -117,12 +137,12 @@ Controller.prototype.start = function(){
   while(this.game.winner === null){
     this.play();
   }
-  console.log("THE WINNER IS " + this.game.winner);
+  this.game.view.displayMessage("THE WINNER IS " + this.game.winner);
 }
 
 Controller.prototype.play = function(){
-  console.log(this.game.board);
-  console.log("Player: " +this.game.activePlayer.color + " Pieces: " + this.game.activePlayer.pieces);
+  this.game.view.refreshBoard(this.game.board.allPieces);
+  this.game.view.playerStats("Player: " +this.game.activePlayer.color + " Pieces: " + this.game.activePlayer.pieces);
   if(this.game.piecesRemaining()){
     var col = prompt("Enter your column number");
     this.game.addToCol(parseInt(col));
@@ -132,12 +152,10 @@ Controller.prototype.play = function(){
     }
     else {
       this.game.winner = this.game.activePlayer.color;
-      console.log("Winner!");
     }
   }
   else {
     this.game.winner = "DRAW. No one wins."
-    console.log("Draw");
   }
 }
 
