@@ -93,9 +93,7 @@ Board.prototype.addPiece = function(col, playerNum){
     }
 }
 
-
 // PLAYER MODEL
-
 function Player(color, num){
   this.color = color;
   this.num = num;
@@ -111,7 +109,6 @@ Player.prototype.removePiece = function(){
 // VIEW
 function View(){
   this.currentPlayer = $('#current-player');
-  this.board = $('#board');
   this.messages = $('#messages');
 }
 
@@ -120,7 +117,20 @@ View.prototype.displayMessage = function(message){
 }
 
 View.prototype.refreshBoard = function(boardPieces){
-  this.board.html(boardPieces.toString());
+  for(var row = 0; row < 4; row++){
+    for(var col = 0; col < 4; col++){
+      if(boardPieces[row][col] > 0){
+        var rowNum = row + 1;
+        var colNum = col + 1;
+        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'black');
+      }
+      else if(boardPieces[row][col] < 0){
+        var rowNum = row + 1;
+        var colNum = col + 1;
+        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'red');
+      }
+    }
+  }
 }
 
 View.prototype.playerStats = function(info){
