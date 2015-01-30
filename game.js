@@ -8,17 +8,17 @@ function Game(){
 }
 
 Game.prototype.addToCol = function(col){
-    this.board.addPiece(col, this.activePlayer.num);
+  this.board.addPiece(col, this.activePlayer.num);
 }
 
 Game.prototype.piecesRemaining = function(){
-    if(this.activePlayer.pieces > 0){
-      return true;
-    }
-    else{
-      return false;
-    }
+  if(this.activePlayer.pieces > 0){
+    return true;
   }
+  else{
+    return false;
+  }
+}
 
 Game.prototype.changeActivePlayer = function(){
   if(this.activePlayer === this.players[0]){
@@ -123,26 +123,25 @@ Controller.prototype.start = function(){
 Controller.prototype.play = function(){
   console.log(this.game.board);
   console.log("Player: " +this.game.activePlayer.color + " Pieces: " + this.game.activePlayer.pieces);
-    if(this.game.piecesRemaining()){
-      var col = prompt("Enter your column number");
-      this.game.addToCol(parseInt(col));
-      this.game.activePlayer.removePiece();
-      if(this.game.board.connectFour()===false){
-        this.game.changeActivePlayer();
-      }
-      else {
-        this.game.winner = this.game.activePlayer.color;
-        console.log("Winner!");
-      }
+  if(this.game.piecesRemaining()){
+    var col = prompt("Enter your column number");
+    this.game.addToCol(parseInt(col));
+    this.game.activePlayer.removePiece();
+    if(this.game.board.connectFour()===false){
+      this.game.changeActivePlayer();
     }
-    else{
-      this.game.winner = "DRAW. No one wins."
-      console.log("Draw");
+    else {
+      this.game.winner = this.game.activePlayer.color;
+      console.log("Winner!");
     }
+  }
+  else {
+    this.game.winner = "DRAW. No one wins."
+    console.log("Draw");
+  }
 }
 
 // DRIVER CODE
-
 $( document ).ready(function() {
   var controller = new Controller();
   controller.start();
