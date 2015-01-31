@@ -3,7 +3,7 @@
 function Game(){
   this.board = new Board();
   this.view = new View(this);
-  this.players = [new Player("black", 1), new Player("red", -1)];
+  this.players = [new Player("Pink", 1), new Player("LightGreen", -1)];
   this.winner = null;
   this.activePlayer = this.players[0];
 }
@@ -13,13 +13,15 @@ Game.prototype.start = function(){
 }
 
 Game.prototype.play = function(){
-  this.view.playerStats("Player: " +this.activePlayer.color + " Pieces: " + this.activePlayer.pieces);
-  if(this.piecesRemaining() === false){
-    this.winner = "DRAW. No one wins";
-    this.view.displayMessage("THE WINNER IS " + this.winner);
+  this.view.playerStats(this.activePlayer.color +"'s Turn - " + this.activePlayer.pieces + " Remaining");
+  if(this.winner !== null){
+    $('#active-piece').draggable('disable');
+    this.view.showWinner(this.winner);
   }
-  else if(this.winner !== null){
-    this.view.displayMessage("THE WINNER IS " + this.winner);
+  else if(this.piecesRemaining() === false){
+    this.winner = "NO ONE. It's a draw.";
+    $('#active-piece').draggable('disable');
+    this.view.showWinner(this.winner);
   }
   else{
     this.view.prepareDragDrop(this.activePlayer);
@@ -31,6 +33,9 @@ Game.prototype.colFull = function(col){
     return false;
   }
   else {
+    $('#error').dialog({
+    show: { effect: "fadeIn", duration: 500}
+  });
     return true;
   }
 }
@@ -137,12 +142,13 @@ Player.prototype.removePiece = function(){
 function View(game){
   this.game = game;
   this.currentPlayer = $('#current-player');
-  this.messages = $('#messages');
+  this.winner = $('#winner');
   this.board = $('#board table');
 }
 
-View.prototype.displayMessage = function(message){
-  this.messages.html(message);
+View.prototype.showWinner = function(winner){
+  this.winner.html("THE WINNER IS "+ winner);
+  this.winner.slideDown(1000);
 }
 
 View.prototype.renderBoard = function(boardPieces){
@@ -151,12 +157,12 @@ View.prototype.renderBoard = function(boardPieces){
       if(boardPieces[row][col] > 0){
         var rowNum = row + 1;
         var colNum = col + 1;
-        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'black');
+        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'Pink');
       }
       else if(boardPieces[row][col] < 0){
         var rowNum = row + 1;
         var colNum = col + 1;
-        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'red');
+        $('#board table tr:nth-child('+rowNum+') :nth-child('+colNum+')').css('background-color', 'LightGreen');
       }
     }
   }
@@ -180,24 +186,31 @@ View.prototype.makeDraggable = function(currPlayer){
 
 View.prototype.makeDroppable = function(){
   $('.first-row').droppable({
+    hoverClass: "hover",
     drop: this.executeOnDrop
   });
 }
 
 View.prototype.executeOnDrop = function(event, ui){
   var colIndex = parseInt(event.target.dataset.col);
-  myGame.addToCol(parseInt(colIndex));
-  myGame.activePlayer.removePiece();
-  if(myGame.board.connectFour()===false){
-      myGame.changeActivePlayer();
+  if(myGame.colFull(colIndex) === false){
+    myGame.addToCol(parseInt(colIndex));
+    myGame.activePlayer.removePiece();
+    if(myGame.board.connectFour()===false){
+        myGame.changeActivePlayer();
+        myGame.view.resetActivePiece();
+        myGame.play();
+    }
+    else {
+      myGame.view.renderBoard(myGame.board.allPieces);
+      myGame.winner = myGame.activePlayer.color;
       myGame.view.resetActivePiece();
+      $('#active-piece').draggable('disable');
       myGame.play();
+    }
   }
-  else {
-    myGame.view.renderBoard(myGame.board.allPieces);
-    myGame.winner = myGame.activePlayer.color;
+  else{
     myGame.view.resetActivePiece();
-    $('#active-piece').draggable('disable');
     myGame.play();
   }
 }
@@ -205,7 +218,7 @@ View.prototype.executeOnDrop = function(event, ui){
 View.prototype.resetActivePiece = function(){
   $("#active-piece").animate({
         top: "0px",
-        left: "400px"
+        left: "0px"
     });
 }
 
@@ -216,5 +229,8 @@ View.prototype.fadeActivePiece = function(){
 // DRIVER CODE
 $( document ).ready(function() {
   myGame = new Game();
+  $('#dialog').dialog({
+    show: { effect: "fadeIn", duration: 800}
+  });
   myGame.start();
 });

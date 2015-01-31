@@ -1,15 +1,80 @@
+body {
+  background: url('http://fc00.deviantart.net/fs11/i/2006/257/3/4/Some_clouds__sun_by_mattahan.png') no-repeat center center fixed;
+  font-family: 'Walter Turncoat', cursive;
+  background-color: skyBlue;
+}
+
+table {
+  background-color: skyBlue;
+  border: 10px solid white;
+  margin-top: 2%;
+  margin-bottom: 5%;
+}
+
+#game-space {
+  padding: 5%;
+  margin: 10% 10% 5% 10%;
+  background-color:rgba(255,255,255,0.3);
+  border-radius: 30%;
+}
+
 .cell {
   width: 100px;
   height: 100px;
   background-color: white;
-  border: 1px solid black;
   border-radius: 50%;
 }
 
 #active-piece {
   width: 100px;
   height: 100px;
-  background-color: white;
-  border: 1px solid black;
+  background-color: pink;
   border-radius: 50%;
+  box-shadow: 5px 5px 5px #888888;
+}
+
+
+#current-player {
+  margin: 2% 10% 2% 10%;
+  padding: 2%;
+  font-size: 2em;
+  color: white;
+}
+
+#winner {
+  display: none;
+  font-size: 4em;
+  margin: 2% 5% 2% 5%;
+  padding: 5%;
+  color: white;
+}
+
+#dialog {
+  display: none;
+  font-family: 'Walter Turncoat', cursive;
+}
+
+#error {
+  display: none;
+  font-family: 'Walter Turncoat', cursive;
+}
+
+.hover {
+  box-shadow: 5px 5px 5px #888888;
+}
+
+@media (max-width: 629px) {
+  body {
+    font-size: .5em;
+  }
+
+  .cell {
+    width: 50px;
+    height: 50px;
+  }
+
+  #active-piece {
+    width: 50px;
+    height: 50px;
+  }
 }

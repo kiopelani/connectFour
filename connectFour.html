@@ -3,46 +3,55 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="connectFour.css">
+  <link href='http://fonts.googleapis.com/css?family=Walter+Turncoat|Gloria+Hallelujah|Pacifico' rel='stylesheet' type='text/css'>
+
   <title>Connect Four</title>
 </head>
 <body>
-  <h1>Connect Four</h1>
-  <div id="messages">
-    Let's play!
-  </div>
-  <div id="current-player">
-  </div>
-  <div id="active-piece">
-  </div>
-  <div id="board">
-    <table>
-      <tr>
-        <td class="cell first-row" data-col="0"></td>
-        <td class="cell first-row" data-col="1"></td>
-        <td class="cell first-row" data-col="2"></td>
-        <td class="cell first-row" data-col="3"></td>
-      </tr>
-      <tr>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-      </tr>
-      <tr>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-      </tr>
-      <tr>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-        <td class="cell"></td>
-      </tr>
-    </table>
-  </div>
-
+  <center><div id="game-space">
+<!--     <h1>Connect Four</h1>
+ -->    <div id="winner">
+    </div>
+    <div id="current-player">
+    </div>
+    <div id="active-piece">
+    </div>
+    <div id="board">
+      <table>
+        <tr>
+          <td class="cell first-row" data-col="0"></td>
+          <td class="cell first-row" data-col="1"></td>
+          <td class="cell first-row" data-col="2"></td>
+          <td class="cell first-row" data-col="3"></td>
+        </tr>
+        <tr>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+        </tr>
+        <tr>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+        </tr>
+        <tr>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+          <td class="cell"></td>
+        </tr>
+      </table>
+      <div id="dialog">
+        <h2>Connect Four</h2>
+        <p>The first player to get 4 colors in a row wins.<p> To play, drag the piece at the top of the board down to the column you wish to add it to.<p> Close this window to play!
+      </div>
+      <div id="error">
+        <p>Oopse that column is full! Please choose another one!</p>
+      </div>
+    </div>
+  </div></center>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
