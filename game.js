@@ -2,30 +2,39 @@
 
 function Game(){
   this.board = new Board();
-  this.view = new View(this);
+  this.view = new View();
   this.players = [new Player("Pink", 1), new Player("LightGreen", -1)];
   this.winner = null;
   this.activePlayer = this.players[0];
 }
 
 Game.prototype.start = function(){
+  $('#dialog').dialog({
+    show: { effect: "fadeIn", duration: 800}
+  });
   this.play();
 }
 
 Game.prototype.play = function(){
-  this.view.playerStats(this.activePlayer.color +"'s Turn - " + this.activePlayer.pieces + " Remaining");
+  this.checkForDraw();
   if(this.winner !== null){
-    $('#active-piece').draggable('disable');
+    this.view.disableActivePiece();
     this.view.showWinner(this.winner);
   }
-  else if(this.piecesRemaining() === false){
+  else {
+    this.view.renderPlayerStats(this.activePlayer);
+    this.view.initDragDrop(this.activePlayer, this.board);
+  }
+}
+
+Game.prototype.checkForDraw = function(){
+  if(this.piecesRemaining() === false && this.winner === null){
     this.winner = "NO ONE. It's a draw.";
-    $('#active-piece').draggable('disable');
-    this.view.showWinner(this.winner);
   }
-  else{
-    this.view.prepareDragDrop(this.activePlayer);
-  }
+}
+
+Game.prototype.piecesRemaining = function(){
+  this.activePlayer.pieces > 0
 }
 
 Game.prototype.colFull = function(col){
@@ -34,7 +43,7 @@ Game.prototype.colFull = function(col){
   }
   else {
     $('#error').dialog({
-    show: { effect: "fadeIn", duration: 500}
+    show: { effect: "fadeIn", duration: 500 }
   });
     return true;
   }
@@ -44,22 +53,8 @@ Game.prototype.addToCol = function(col){
   this.board.addPiece(col, this.activePlayer.num);
 }
 
-Game.prototype.piecesRemaining = function(){
-  if(this.activePlayer.pieces > 0){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 Game.prototype.changeActivePlayer = function(){
-  if(this.activePlayer === this.players[0]){
-    this.activePlayer = this.players[1];
-  }
-  else{
-    this.activePlayer = this.players[0];
-  }
+  (this.activePlayer === this.players[0])? (this.activePlayer = this.players[1]) : (this.activePlayer = this.players[0]);
 }
 
 // BOARD MODEL
@@ -139,11 +134,14 @@ Player.prototype.removePiece = function(){
 }
 
 // VIEW
-function View(game){
-  this.game = game;
+function View(){
   this.currentPlayer = $('#current-player');
   this.winner = $('#winner');
   this.board = $('#board table');
+}
+
+View.prototype.disableActivePiece = function(){
+  $('#active-piece').draggable('disable');
 }
 
 View.prototype.showWinner = function(winner){
@@ -168,12 +166,12 @@ View.prototype.renderBoard = function(boardPieces){
   }
 }
 
-View.prototype.playerStats = function(info){
-  this.currentPlayer.html(info);
+View.prototype.renderPlayerStats = function(activePlayer){
+  this.currentPlayer.html(activePlayer.color +"'s Turn - " + activePlayer.pieces + " Remaining");
 }
 
-View.prototype.prepareDragDrop = function(currPlayer){
-  this.renderBoard(this.game.board.allPieces);
+View.prototype.initDragDrop = function(currPlayer, board){
+  this.renderBoard(board.allPieces);
   this.makeDraggable(currPlayer);
   this.makeDroppable();
 }
@@ -205,7 +203,7 @@ View.prototype.executeOnDrop = function(event, ui){
       myGame.view.renderBoard(myGame.board.allPieces);
       myGame.winner = myGame.activePlayer.color;
       myGame.view.resetActivePiece();
-      $('#active-piece').draggable('disable');
+      myGame.view.disableActivePiece();
       myGame.play();
     }
   }
@@ -229,8 +227,5 @@ View.prototype.fadeActivePiece = function(){
 // DRIVER CODE
 $( document ).ready(function() {
   myGame = new Game();
-  $('#dialog').dialog({
-    show: { effect: "fadeIn", duration: 800}
-  });
   myGame.start();
 });
