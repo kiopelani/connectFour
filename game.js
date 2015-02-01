@@ -17,7 +17,7 @@ Game.prototype.start = function(){
 
 Game.prototype.play = function(){
   this.checkForDraw();
-  if(this.winner !== null){
+  if(this.winner){
     this.view.disableActivePiece();
     this.view.showWinner(this.winner);
   }
@@ -28,13 +28,13 @@ Game.prototype.play = function(){
 }
 
 Game.prototype.checkForDraw = function(){
-  if(this.piecesRemaining() === false && this.winner === null){
+  if(!this.piecesRemaining() && this.winner === null){
     this.winner = "NO ONE. It's a draw.";
   }
 }
 
 Game.prototype.piecesRemaining = function(){
-  this.activePlayer.pieces > 0
+  return this.activePlayer.pieces > 0;
 }
 
 Game.prototype.colFull = function(col){
@@ -110,13 +110,15 @@ Board.prototype.checkCol = function(col){
 Board.prototype.addPiece = function(col, playerNum){
   var filled = false;
     i = 3;
-    while(filled === false && i >= 0){
+    while(!filled && i >= 0){
       if(this.allPieces[i][col] === 0){
         this.allPieces[i][col] = playerNum;
         filled = true;
         this.lastAdded = [i,col];
       }
-      else{i = i - 1;}
+      else {
+        i = i - 1;
+      }
     }
 }
 
@@ -138,10 +140,15 @@ function View(){
   this.currentPlayer = $('#current-player');
   this.winner = $('#winner');
   this.board = $('#board table');
+  this.activePiece = $('#active-piece');
+}
+
+View.prototype.renderPlayerStats = function(activePlayer){
+  this.currentPlayer.html(activePlayer.color +"'s Turn - " + activePlayer.pieces + " Remaining");
 }
 
 View.prototype.disableActivePiece = function(){
-  $('#active-piece').draggable('disable');
+  this.activePiece.draggable('disable');
 }
 
 View.prototype.showWinner = function(winner){
@@ -166,10 +173,6 @@ View.prototype.renderBoard = function(boardPieces){
   }
 }
 
-View.prototype.renderPlayerStats = function(activePlayer){
-  this.currentPlayer.html(activePlayer.color +"'s Turn - " + activePlayer.pieces + " Remaining");
-}
-
 View.prototype.initDragDrop = function(currPlayer, board){
   this.renderBoard(board.allPieces);
   this.makeDraggable(currPlayer);
@@ -177,40 +180,15 @@ View.prototype.initDragDrop = function(currPlayer, board){
 }
 
 View.prototype.makeDraggable = function(currPlayer){
-  var activePiece = $('#active-piece');
-  activePiece.css('background-color', currPlayer.color);
-  activePiece.draggable();
+  this.activePiece.css('background-color', currPlayer.color);
+  this.activePiece.draggable();
 }
 
 View.prototype.makeDroppable = function(){
   $('.first-row').droppable({
     hoverClass: "hover",
-    drop: this.executeOnDrop
+    drop: executeOnDrop
   });
-}
-
-View.prototype.executeOnDrop = function(event, ui){
-  var colIndex = parseInt(event.target.dataset.col);
-  if(myGame.colFull(colIndex) === false){
-    myGame.addToCol(parseInt(colIndex));
-    myGame.activePlayer.removePiece();
-    if(myGame.board.connectFour()===false){
-        myGame.changeActivePlayer();
-        myGame.view.resetActivePiece();
-        myGame.play();
-    }
-    else {
-      myGame.view.renderBoard(myGame.board.allPieces);
-      myGame.winner = myGame.activePlayer.color;
-      myGame.view.resetActivePiece();
-      myGame.view.disableActivePiece();
-      myGame.play();
-    }
-  }
-  else{
-    myGame.view.resetActivePiece();
-    myGame.play();
-  }
 }
 
 View.prototype.resetActivePiece = function(){
@@ -223,6 +201,27 @@ View.prototype.resetActivePiece = function(){
 View.prototype.fadeActivePiece = function(){
   $("#active-piece").fadeOut(500);
 }
+
+// DROP FUNCTION
+
+function executeOnDrop(event, ui){
+  var colIndex = parseInt(event.target.dataset.col);
+  if (!myGame.colFull(colIndex)){
+    myGame.addToCol(parseInt(colIndex));
+    myGame.activePlayer.removePiece();
+    if(!myGame.board.connectFour()){
+        myGame.changeActivePlayer();
+    }
+    else {
+      myGame.view.renderBoard(myGame.board.allPieces);
+      myGame.winner = myGame.activePlayer.color;
+      myGame.view.disableActivePiece();
+    }
+  }
+  myGame.view.resetActivePiece();
+  myGame.play();
+}
+
 
 // DRIVER CODE
 $( document ).ready(function() {
